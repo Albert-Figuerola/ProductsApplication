@@ -1,4 +1,4 @@
-package com.products.application.shared.extension
+package com.products.application.common.extension
 
 import java.math.BigDecimal
 import java.math.RoundingMode

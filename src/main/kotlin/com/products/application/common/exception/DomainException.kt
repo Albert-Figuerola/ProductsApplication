@@ -1,4 +1,4 @@
-package com.products.application.shared.exception
+package com.products.application.common.exception
 
 abstract class DomainException(
     val code: String,
