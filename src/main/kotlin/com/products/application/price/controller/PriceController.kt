@@ -42,7 +42,7 @@ class PriceController(
             ).toResponse()
         )
 
-    @GetMapping("/{id}/prices")
+    @GetMapping("/{id}/prices", params = ["date"])
     fun getActivePrice(
         @PathVariable("id") productId: UUID,
         @RequestParam date: LocalDate
