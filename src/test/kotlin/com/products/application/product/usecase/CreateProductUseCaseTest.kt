@@ -13,7 +13,7 @@ import kotlin.test.assertEquals
 
 class CreateProductUseCaseTest {
 
-    private val productPort = mock<ProductPort>()
+    private val productPort: ProductPort = mock()
     private val createProductUseCase = CreateProductUseCase(productPort)
 
     @Test

@@ -38,18 +38,15 @@ class ProductJpaAdapterTest {
         productJpaAdapter.save(product)
 
         val persistedProduct = productJpaRepository.findById(product.id)
+            .orElseThrow {
+                AssertionError("Product was not persisted")
+            }
 
-        assertTrue(persistedProduct.isPresent)
-
-        val entity = persistedProduct.orElseThrow {
-            AssertionError("Product was not persisted")
-        }
-
-        assertEquals(product.id, entity.id)
-        assertEquals(product.name, entity.name)
-        assertEquals(product.description, entity.description)
-        assertTrue(entity.createdAt <= LocalDateTime.now())
-        assertTrue(entity.updatedAt <= LocalDateTime.now())
+        assertEquals(product.id, persistedProduct.id)
+        assertEquals(product.name, persistedProduct.name)
+        assertEquals(product.description, persistedProduct.description)
+        assertTrue(persistedProduct.createdAt <= LocalDateTime.now())
+        assertTrue(persistedProduct.updatedAt <= LocalDateTime.now())
     }
 
     private fun createProduct() =
