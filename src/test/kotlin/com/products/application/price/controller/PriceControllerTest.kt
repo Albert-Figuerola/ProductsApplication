@@ -4,6 +4,8 @@ import com.products.application.price.command.model.CreatePriceCommand
 import com.products.application.price.command.model.CreatePriceRequest
 import com.products.application.price.command.usecase.CreatePriceUseCase
 import com.products.application.price.domain.Price
+import com.products.application.price.query.usecase.GetActivePriceUseCase
+import com.products.application.product.exception.ProductNotFoundException
 import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -18,7 +20,9 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.http.MediaType
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import tools.jackson.databind.ObjectMapper
@@ -37,6 +41,9 @@ class PriceControllerTest {
 
     @MockitoBean
     private lateinit var createPriceUseCase: CreatePriceUseCase
+
+    @MockitoBean
+    private lateinit var getActivePriceUseCase: GetActivePriceUseCase
 
     @Test
     fun `should return 201 when a price is created`() {
@@ -177,6 +184,66 @@ class PriceControllerTest {
             .andExpect(status().isBadRequest)
 
         verifyNoInteractions(createPriceUseCase)
+    }
+
+    @Test
+    fun `should return 200 with active price value`() {
+        val request = createPriceRequest()
+        val price = createPrice(request)
+
+        val productId = UUID.randomUUID()
+        val date = LocalDate.of(2024, 4, 15)
+
+        whenever(getActivePriceUseCase.execute(productId, date))
+            .thenReturn(price)
+
+        mockMvc.perform(
+            get("/api/v1/products/$productId/prices")
+                .param("date", date.toString())
+        )
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.value").value(99.12))
+
+        verify(getActivePriceUseCase).execute(productId, date)
+    }
+
+    @Test
+    fun `should return 204 when no active price exists`() {
+        val productId = UUID.randomUUID()
+        val date = LocalDate.of(2024, 4, 15)
+
+        whenever(getActivePriceUseCase.execute(productId, date))
+            .thenReturn(null)
+
+        mockMvc.perform(
+            get("/api/v1/products/$productId/prices")
+                .param("date", date.toString())
+        )
+            .andExpect(status().isNoContent)
+            .andExpect(content().string(""))
+
+        verify(getActivePriceUseCase).execute(productId, date)
+    }
+
+    @Test
+    fun `should return 404 when product does not exist`() {
+        val productId = UUID.randomUUID()
+        val date = LocalDate.of(2024, 4, 15)
+
+        whenever(getActivePriceUseCase.execute(productId, date))
+            .thenThrow(ProductNotFoundException(productId))
+
+        mockMvc.perform(
+            get("/api/v1/products/$productId/prices")
+                .param("date", date.toString())
+        )
+            .andExpect(status().isNotFound)
+            .andExpect(jsonPath("$.code").value("PRODUCT_NOT_FOUND"))
+            .andExpect(
+                jsonPath("$.message").value("Product with id $productId not found")
+            )
+
+        verify(getActivePriceUseCase).execute(productId, date)
     }
 
     private fun createPriceRequest(
