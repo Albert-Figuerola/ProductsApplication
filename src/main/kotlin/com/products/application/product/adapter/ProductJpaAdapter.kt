@@ -4,7 +4,9 @@ import com.products.application.product.domain.Product
 import com.products.application.product.exception.ProductNotFoundException
 import com.products.application.product.mapper.toDomain
 import com.products.application.product.mapper.toEntity
+import com.products.application.product.mapper.toProductWithPrices
 import com.products.application.product.port.ProductPort
+import com.products.application.product.query.model.ProductWithPrices
 import com.products.application.product.repository.ProductJpaRepository
 import org.springframework.stereotype.Repository
 import java.util.UUID
@@ -25,5 +27,8 @@ class ProductJpaAdapter(
     override fun existsById(productId: UUID): Boolean {
         return productJpaRepository.existsById(productId)
     }
+
+    override fun findByIdWithPrices(productId: UUID): ProductWithPrices? =
+        productJpaRepository.findByIdWithPrices(productId)?.toProductWithPrices()
 
 }

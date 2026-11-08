@@ -13,4 +13,13 @@ interface ProductJpaRepository : JpaRepository<ProductEntity, UUID> {
     @Query("SELECT p FROM ProductEntity p WHERE p.id = :productId")
     fun findByIdForUpdate(productId: UUID): ProductEntity?
 
+    @Query(
+        """
+            SELECT p FROM ProductEntity p
+            LEFT JOIN FETCH p.prices
+            WHERE p.id = :productId
+        """
+    )
+    fun findByIdWithPrices(productId: UUID): ProductEntity?
+
 }
