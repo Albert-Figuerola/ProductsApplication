@@ -1,6 +1,6 @@
 package com.products.application.price.exception
 
-import com.products.application.shared.exception.DomainException
+import com.products.application.common.exception.DomainException
 import java.util.UUID
 
 class PriceDateOverlapException(
