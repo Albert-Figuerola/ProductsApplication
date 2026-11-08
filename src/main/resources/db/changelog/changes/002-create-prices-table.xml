@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="002-create-prices-table" author="albert">
+
+        <createTable tableName="prices">
+            <column name="id" type="CHAR(36)">
+                <constraints primaryKey="true"
+                             primaryKeyName="pk_prices"
+                             nullable="false"/>
+            </column>
+
+            <column name="value" type="DECIMAL(11,6)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="init_date" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="end_date" type="DATE"/>
+
+            <column name="product_id" type="CHAR(36)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="created_at" type="DATETIME(6)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="updated_at" type="DATETIME(6)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex indexName="idx_prices_product_id"
+                     tableName="prices">
+            <column name="product_id"/>
+        </createIndex>
+
+        <addForeignKeyConstraint
+                constraintName="fk_prices_product"
+                baseTableName="prices"
+                baseColumnNames="product_id"
+                referencedTableName="products"
+                referencedColumnNames="id"
+                onDelete="RESTRICT"/>
+
+        <sql>
+            ALTER TABLE prices
+                ADD CONSTRAINT chk_prices_value_positive
+                    CHECK (value > 0);
+        </sql>
+
+        <sql>
+            ALTER TABLE prices
+                ADD CONSTRAINT chk_prices_dates
+                    CHECK (end_date IS NULL OR end_date > init_date);
+        </sql>
+
+    </changeSet>
+
+</databaseChangeLog>

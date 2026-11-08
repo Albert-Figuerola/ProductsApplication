@@ -26,7 +26,7 @@ class ProductController(
         @Valid @RequestBody request: CreateProductRequest
     ): SuccessResponse =
         success(
-            createProductUseCase.execute(request.toCommand()).toResponse(),
+            createProductUseCase.execute(request.toCommand()).toResponse()
         )
 
 }
