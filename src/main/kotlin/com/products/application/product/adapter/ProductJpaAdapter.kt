@@ -1,6 +1,5 @@
 package com.products.application.product.adapter
 
-import com.products.application.price.repository.PriceJpaRepository
 import com.products.application.product.domain.Product
 import com.products.application.product.exception.ProductNotFoundException
 import com.products.application.product.mapper.toDomain
