@@ -4,7 +4,6 @@ import com.products.application.price.command.model.CreatePriceCommand
 import com.products.application.price.command.model.CreatePriceRequest
 import com.products.application.price.command.usecase.CreatePriceUseCase
 import com.products.application.price.domain.Price
-import com.products.application.shared.extension.roundToTwoDecimals
 import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest

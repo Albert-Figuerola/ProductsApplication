@@ -8,7 +8,6 @@ import com.products.application.product.mapper.toEntity
 import com.products.application.product.port.ProductPort
 import com.products.application.product.repository.ProductJpaRepository
 import org.springframework.stereotype.Repository
-import java.time.LocalDate
 import java.util.UUID
 
 @Repository

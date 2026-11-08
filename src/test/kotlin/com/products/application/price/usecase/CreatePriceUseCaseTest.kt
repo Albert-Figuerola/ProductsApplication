@@ -6,7 +6,6 @@ import com.products.application.price.domain.Price
 import com.products.application.price.exception.PriceDateOverlapException
 import com.products.application.price.port.PricePort
 import com.products.application.product.port.ProductPort
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.Mockito.mock
@@ -14,7 +13,6 @@ import org.mockito.Mockito.never
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.math.BigDecimal
 import java.time.LocalDate
