@@ -39,4 +39,10 @@ class PriceJpaAdapter (
         return priceJpaRepository.save(price.toEntity(productEntity)).toDomain()
     }
 
+    override fun findActivePrice(
+        productId: UUID,
+        date: LocalDate
+    ): Price? =
+        priceJpaRepository.findActivePrice(productId, date)?.toDomain()
+
 }

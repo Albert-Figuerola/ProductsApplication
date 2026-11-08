@@ -8,7 +8,8 @@ import java.util.UUID
 
 interface PriceJpaRepository : JpaRepository<PriceEntity, UUID> {
 
-    @Query("""
+    @Query(
+        """
         SELECT CASE WHEN COUNT(p) > 0 THEN true ELSE false END
         FROM PriceEntity p
         WHERE p.product.id = :productId
@@ -21,5 +22,18 @@ interface PriceJpaRepository : JpaRepository<PriceEntity, UUID> {
         initDate: LocalDate,
         endDate: LocalDate?
     ): Boolean
+
+    @Query(
+        """
+            SELECT p FROM PriceEntity p
+            WHERE p.product.id = :productId
+            AND p.initDate <= :date
+            AND (p.endDate IS NULL OR p.endDate >= :date)
+        """
+    )
+    fun findActivePrice(
+        productId: UUID,
+        date: LocalDate
+    ): PriceEntity?
 
 }

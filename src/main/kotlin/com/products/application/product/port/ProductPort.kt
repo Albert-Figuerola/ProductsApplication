@@ -9,4 +9,5 @@ interface ProductPort {
 
     fun lockById(productId: UUID)
 
+    fun existsById(productId: UUID): Boolean
 }

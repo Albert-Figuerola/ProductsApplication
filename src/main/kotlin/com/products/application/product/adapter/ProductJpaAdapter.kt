@@ -22,4 +22,8 @@ class ProductJpaAdapter(
             ?: throw ProductNotFoundException(productId)
     }
 
+    override fun existsById(productId: UUID): Boolean {
+        return productJpaRepository.existsById(productId)
+    }
+
 }

@@ -14,4 +14,6 @@ interface PricePort {
 
     fun save(price: Price, productId: UUID): Price
 
+    fun findActivePrice(productId: UUID, date: LocalDate): Price?
+
 }

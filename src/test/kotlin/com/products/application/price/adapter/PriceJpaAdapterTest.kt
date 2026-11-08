@@ -6,6 +6,9 @@ import com.products.application.product.adapter.ProductJpaAdapter
 import com.products.application.product.domain.Product
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertNull
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
@@ -60,6 +63,113 @@ class PriceJpaAdapterTest {
 
         assertTrue(persistedPrice.createdAt <= LocalDateTime.now())
         assertTrue(persistedPrice.updatedAt <= LocalDateTime.now())
+    }
+
+    @Test
+    fun `should find active price for given date`() {
+        val productId = UUID.randomUUID()
+        val product = Product(
+            id = productId,
+            name = "Test product",
+            description = "Test description"
+        )
+
+        productJpaAdapter.save(product)
+
+        val price = Price(
+            id = UUID.randomUUID(),
+            value = BigDecimal("99.123456"),
+            initDate = LocalDate.of(2024, 1, 1),
+            endDate = LocalDate.of(2024, 12, 31)
+        )
+
+        priceJpaAdapter.save(price, productId)
+
+        val result = requireNotNull(
+            priceJpaAdapter.findActivePrice(
+                productId,
+                LocalDate.of(2024, 4, 15)
+            )
+        )
+
+        assertEquals(price.id, result.id)
+        assertEquals(0, price.value.compareTo(result.value))
+        assertEquals(price.initDate, result.initDate)
+        assertEquals(price.endDate, result.endDate)
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = [
+        "2023-12-31",
+        "2024-01-01",
+        "2024-12-31",
+        "2025-01-01"
+    ])
+    fun `should respect active price date boundaries`(date: String) {
+        val productId = UUID.randomUUID()
+
+        productJpaAdapter.save(
+            Product(
+                id = productId,
+                name = "Test product",
+                description = "Test description"
+            )
+        )
+
+        val price = Price(
+            id = UUID.randomUUID(),
+            value = BigDecimal("99.123456"),
+            initDate = LocalDate.of(2024, 1, 1),
+            endDate = LocalDate.of(2024, 12, 31)
+        )
+
+        priceJpaAdapter.save(price, productId)
+
+        val result = priceJpaAdapter.findActivePrice(
+            productId,
+            LocalDate.parse(date)
+        )
+
+        when (date) {
+            "2024-01-01", "2024-12-31" ->
+                assertEquals(price.id, requireNotNull(result).id)
+
+            else ->
+                assertNull(result)
+        }
+    }
+
+    @Test
+    fun `should find active price when end date is null`() {
+        val productId = UUID.randomUUID()
+
+        productJpaAdapter.save(
+            Product(
+                id = productId,
+                name = "Test product",
+                description = "Test description"
+            )
+        )
+
+        val price = Price(
+            id = UUID.randomUUID(),
+            value = BigDecimal("99.123456"),
+            initDate = LocalDate.of(2024, 1, 1),
+            endDate = null
+        )
+
+        priceJpaAdapter.save(price, productId)
+
+        val result = requireNotNull(
+            priceJpaAdapter.findActivePrice(
+                productId,
+                LocalDate.of(2030, 4, 15)
+            )
+        )
+
+        assertEquals(price.id, result.id)
+        assertEquals(0, price.value.compareTo(result.value))
+        assertNull(result.endDate)
     }
 
     private fun createProduct() =
